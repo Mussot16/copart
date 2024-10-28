@@ -1,17 +1,15 @@
-/** @type {import('tailwindcss').Config} */
+// tailwind.config.js
 module.exports = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    './app/**/*.{js,ts,jsx,tsx,mdx}',     // Corrected wildcard
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',   // Corrected wildcard
+    './components/**/*.{js,ts,jsx,tsx,mdx}', // Corrected wildcard
+
+    // If using src directory:
+    './src/**/*.{js,ts,jsx,tsx,mdx}',     // Corrected wildcard
   ],
   theme: {
-    extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-      },
-    },
+    extend: {},
   },
   plugins: [],
 };

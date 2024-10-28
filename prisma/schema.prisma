@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+model Bid {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  car       Car      @relation(fields: [carId], references: [id])
+  carId     Int
+  createdAt DateTime @default(now())
+}
+model Car {
+  id          Int          @id @default(autoincrement())
+  make        String
+  model       String
+  year        Int
+  price       Float
+  owner       User         @relation(fields: [ownerId], references: [id])
+  ownerId     Int
+  bids        Bid[]
+  description String?
+  imageUrl    String?      // New field to store the image URL
+  transactions Transaction[]  // Relación inversa hacia las transacciones
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  car       Car      @relation(fields: [carId], references: [id])
+  carId     Int
+  buyer     User     @relation("Buyer", fields: [buyerId], references: [id])
+  buyerId   Int
+  seller    User     @relation("Seller", fields: [sellerId], references: [id])
+  sellerId  Int
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  cars      Car[]
+  bids      Bid[]
+  boughtTransactions Transaction[] @relation("Buyer")
+  soldTransactions   Transaction[] @relation("Seller")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
