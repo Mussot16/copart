@@ -30,7 +30,7 @@ export default function CarForm() {
     if (res.ok) {
       setMessage("Car added successfully!");
     } else {
-      setMessage("Failed to add car.");
+      setMessage(data.error || "Failed to add car.");
     }
   };
 

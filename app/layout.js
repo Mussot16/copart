@@ -1,23 +1,22 @@
 // app/layout.js
 import './globals.css';
-import Providers from './components/Providers'; // Import the Providers component
-import LogoutButton from './components/LogoutButton'; // Import the LogoutButton component
+import Providers from './components/Providers';
+import Navbar from './components/Navbar';
+
+export const metadata = {
+  title: 'Car Marketplace',
+  description: 'Find and bid on premium cars',
+};
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
-        {/* Wrap the app with Providers */}
+      <body className="bg-gray-50 font-sans text-gray-900">
         <Providers>
-          <header className="flex justify-between items-center p-4 bg-gray-800 text-white">
-            <h1 className="text-2xl">Car Auctions</h1>
-            <nav>
-              <a href="/cars/add" className="mr-4 text-blue-400 hover:underline">Add Car</a>
-              <LogoutButton />
-            </nav>
-          </header>
-
-          <main>{children}</main>
+          <Navbar />
+          <main className="container mx-auto p-6">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>

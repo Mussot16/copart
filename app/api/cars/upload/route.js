@@ -1,21 +1,19 @@
-import { PrismaClient } from '@prisma/client';
+const Busboy = require('busboy');
+const fs = require('fs');
+const path = require('path');
+const { PrismaClient } = require('@prisma/client');
 import { NextResponse } from 'next/server';
-import Busboy from 'busboy';
-import fs from 'fs';
-import path from 'path';
 
 const prisma = new PrismaClient();
 
-// Helper function to handle the form data parsing
 async function parseForm(req) {
   return new Promise((resolve, reject) => {
     const busboy = new Busboy({ headers: req.headers });
     const formData = {};
 
-    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+    busboy.on('file', (fieldname, file, filename) => {
       const uploadPath = path.join(process.cwd(), 'public', 'uploads', filename);
       const writeStream = fs.createWriteStream(uploadPath);
-
       file.pipe(writeStream);
 
       writeStream.on('close', () => {
@@ -49,7 +47,6 @@ export async function POST(req) {
   try {
     console.log('Processing file upload...');
 
-    // Parse form data
     const formData = await parseForm(req);
 
     if (!formData.file) {
@@ -57,27 +54,27 @@ export async function POST(req) {
       return NextResponse.json({ error: 'File upload failed' }, { status: 500 });
     }
 
-    const { make, model, year, price } = formData;
+    const { make, model, year, price, description } = formData;
 
     if (!make || !model || !year || !price) {
       console.error('Missing required form fields');
       return NextResponse.json({ error: 'Missing required form fields' }, { status: 400 });
     }
 
-    // Save car data to the database
     const car = await prisma.car.create({
       data: {
         make,
         model,
         year: parseInt(year),
         price: parseFloat(price),
-        imageUrl: formData.file, // Save file URL
+        imageUrl: formData.file,
+        description,
       },
     });
 
-    return NextResponse.json({ car }, { status: 200 });
+    return NextResponse.json({ car }, { status: 201 });
   } catch (error) {
     console.error('Error in POST handler:', error);
-    return NextResponse.json({ error: 'File upload failed' }, { status: 500 });
+    return NextResponse.json({ error: 'File upload failed', details: error.message }, { status: 500 });
   }
 }

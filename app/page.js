@@ -11,36 +11,41 @@ export default async function Home() {
   const cars = await getCars();
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-4xl font-bold text-center mb-8">Car Auctions</h1>
+    <div className="max-w-6xl mx-auto p-8">
+      <h1 className="text-5xl font-bold text-center mb-12">Find Your Dream Car</h1>
 
-      {/* Add Car button */}
-      <div className="mb-4">
-        <a href="/cars/add" className="text-blue-600 hover:underline">Add a Car</a>
+      <div className="flex justify-end mb-6">
+        <a href="/cars/add" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+          Add a Car
+        </a>
       </div>
 
       {cars.length > 0 ? (
-        <ul className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {cars.map((car) => (
-            <li key={car.id} className="p-4 border rounded-lg shadow hover:shadow-lg transition flex items-center space-x-4">
-              {/* Display car image */}
+            <div key={car.id} className="border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
               {car.imageUrl && (
                 <img
                   src={car.imageUrl}
                   alt={`${car.make} ${car.model}`}
-                  className="w-32 h-32 object-cover rounded-lg"
+                  className="w-full h-48 object-cover"
                 />
               )}
-              <div>
-                <a href={`/cars/${car.id}`} className="text-xl font-semibold text-blue-600 hover:underline">
-                  {car.make} {car.model} - <span className="text-green-600">${car.price}</span>
+              <div className="p-4">
+                <a href={`/cars/${car.id}`} className="text-2xl font-bold text-blue-600 hover:underline">
+                  {car.make} {car.model}
+                </a>
+                <p className="text-lg font-semibold text-green-600 mt-2">${car.price}</p>
+                <p className="text-gray-700 mt-2">{car.description}</p>
+                <a href={`/cars/${car.id}`} className="text-blue-500 hover:text-blue-700 mt-4 block">
+                  View Details
                 </a>
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       ) : (
-        <p className="text-center text-red-600 font-semibold">No cars available</p>
+        <p className="text-center text-red-600 font-semibold">No cars available at the moment</p>
       )}
     </div>
   );
