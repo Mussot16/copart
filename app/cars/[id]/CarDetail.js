@@ -1,15 +1,14 @@
 "use client";
 
-import { useSession } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 export default function CarDetail({ car, params }) {
   const { data: session } = useSession();
   const [bidAmount, setBidAmount] = useState("");
   const [bids, setBids] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(car.initialTimeLeft || "24:00:00");
+  const [timeLeft, setTimeLeft] = useState("24:00:00");
 
-  // Fetch bids when the component mounts
   useEffect(() => {
     const fetchBids = async () => {
       const response = await fetch(`/api/cars/${params.id}/bid`);
@@ -23,23 +22,19 @@ export default function CarDetail({ car, params }) {
     fetchBids();
   }, [params.id]);
 
-  // Establish WebSocket connection
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:3002");
 
-    socket.onopen = () => {
-      console.log("WebSocket connection opened");
-    };
-
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      if (message.remainingTime) {
+
+      if (message.type === "countdown") {
         setTimeLeft(message.remainingTime);
       }
-    };
 
-    socket.onclose = () => {
-      console.log("WebSocket connection closed");
+      if (message.type === "new_bid") {
+        setBids((prevBids) => [message.bid, ...prevBids]);
+      }
     };
 
     return () => {
@@ -54,23 +49,15 @@ export default function CarDetail({ car, params }) {
     }
 
     const response = await fetch(`/api/cars/${params.id}/bid`, {
-      method: 'POST',
-      body: JSON.stringify({
-        userId: session.user.id,
-        amount: bidAmount,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      method: "POST",
+      body: JSON.stringify({ userId: session.user.id, amount: bidAmount }),
+      headers: { "Content-Type": "application/json" },
     });
 
-    const data = await response.json();
-    if (data.success) {
-      setBids([...bids, data.bid]); // Update bids with the new bid
+    if (response.ok) {
       setBidAmount("");
-      alert("Bid placed successfully");
     } else {
-      alert("Failed to place bid");
+      alert("Failed to place bid.");
     }
   };
 
@@ -101,22 +88,15 @@ export default function CarDetail({ car, params }) {
           </button>
         </div>
       ) : (
-        <p className="text-center text-red-600 mt-4">
-          Please log in to place a bid.
-        </p>
+        <p className="text-center text-red-600 mt-4">Please log in to place a bid.</p>
       )}
 
       <h2 className="text-2xl font-semibold mt-8 mb-4">Current Bids</h2>
       <ul className="space-y-2">
         {bids.map((bid, index) => (
           <li key={index} className="bg-white p-3 rounded-md shadow-sm">
-            <span className="text-lg font-bold text-gray-700">
-              ${bid.amount}
-            </span>{' '}
-            by{' '}
-            <span className="text-blue-600">
-              {bid.user?.name || 'Unknown User'}
-            </span>
+            <span className="text-lg font-bold text-gray-700">${bid.amount}</span>{" "}
+            by <span className="text-blue-600">{bid.user?.name || "Unknown User"}</span>
           </li>
         ))}
       </ul>

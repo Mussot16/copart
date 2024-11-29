@@ -27,12 +27,14 @@ model Car {
   model       String
   year        Int
   price       Float
+  color       String?      // Add car color
+  mileage     Int?         // Mileage in miles or kilometers
   owner       User         @relation(fields: [ownerId], references: [id])
   ownerId     Int
-  bids        Bid[]
   description String?
-  imageUrl    String?      // New field to store the image URL
-  transactions Transaction[]  // Relación inversa hacia las transacciones
+  imageUrl    String?
+  transactions Transaction[]
+  bids        Bid[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }

@@ -1,7 +1,6 @@
-// app/layout.js
 import './globals.css';
+import NavbarClient from './components/NavBarClient'; // New client-side wrapper
 import Providers from './components/Providers';
-import Navbar from './components/Navbar';
 
 export const metadata = {
   title: 'Car Marketplace',
@@ -13,10 +12,8 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="bg-gray-50 font-sans text-gray-900">
         <Providers>
-          <Navbar />
-          <main className="container mx-auto p-6">
-            {children}
-          </main>
+          <NavbarClient /> {/* Client-side Navbar */}
+          <main className="container mx-auto p-6">{children}</main>
         </Providers>
       </body>
     </html>

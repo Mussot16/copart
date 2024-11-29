@@ -1,18 +1,37 @@
-// app/page.js
-import { PrismaClient } from '@prisma/client';
+"use client";
 
-const prisma = new PrismaClient();
+import { useState, useEffect } from "react";
+import Filter from "./components/Filter";
 
-async function getCars() {
-  return await prisma.car.findMany();
-}
+export default function Home() {
+  const [cars, setCars] = useState([]);
 
-export default async function Home() {
-  const cars = await getCars();
+  // Fetch all cars initially
+  useEffect(() => {
+    const fetchCars = async () => {
+      const response = await fetch("/api/cars");
+      if (response.ok) {
+        const data = await response.json();
+        setCars(data.cars);
+      } else {
+        console.error("Failed to fetch cars");
+      }
+    };
+    fetchCars();
+  }, []);
+
+  const handleFilterChange = (filteredCars) => {
+    setCars(filteredCars);
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-8">
       <h1 className="text-5xl font-bold text-center mb-12">Find Your Dream Car</h1>
+
+      {/* Add Filter Component */}
+      <div className="mb-6">
+        <Filter onFilterChange={handleFilterChange} />
+      </div>
 
       <div className="flex justify-end mb-6">
         <a href="/cars/add" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">

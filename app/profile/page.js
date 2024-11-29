@@ -15,6 +15,7 @@ export default function ProfilePage() {
       <h1 className="text-3xl font-bold mb-6">Profile</h1>
       <p><strong>Name:</strong> {session.user.name}</p>
       <p><strong>Email:</strong> {session.user.email}</p>
+      <p><strong>Owner ID:</strong> {session.user.id}</p>
     </div>
   );
 }

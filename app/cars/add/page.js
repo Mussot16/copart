@@ -7,8 +7,11 @@ export default function CarForm() {
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
   const [price, setPrice] = useState("");
-  const [description, setDescription] = useState(""); // Optional description
-  const [message, setMessage] = useState(""); // For user feedback
+  const [description, setDescription] = useState("");
+  const [color, setColor] = useState(""); // Optional color
+  const [mileage, setMileage] = useState(""); // Optional mileage
+  const [ownerId, setOwnerId] = useState(""); // Required ownerId
+  const [message, setMessage] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,18 +22,26 @@ export default function CarForm() {
     formData.append("model", model);
     formData.append("year", year);
     formData.append("price", price);
-    formData.append("description", description); // Optional description
+    formData.append("description", description);
+    formData.append("color", color); // Optional
+    formData.append("mileage", mileage); // Optional
+    formData.append("ownerId", ownerId); // Required
 
-    const res = await fetch("/api/cars/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const response = await fetch("/api/cars/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
-    if (res.ok) {
-      setMessage("Car added successfully!");
-    } else {
-      setMessage(data.error || "Failed to add car.");
+      const data = await response.json();
+      if (response.ok) {
+        setMessage({ text: "Car added successfully!", type: "success" });
+      } else {
+        setMessage({ text: data.error || "Failed to add car.", type: "error" });
+      }
+    } catch (error) {
+      setMessage({ text: "Something went wrong!", type: "error" });
+      console.error("Error submitting car form:", error);
     }
   };
 
@@ -87,6 +98,34 @@ export default function CarForm() {
           />
         </div>
         <div className="mb-4">
+          <label>Color</label>
+          <input
+            type="text"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+            className="block w-full border rounded p-2"
+          />
+        </div>
+        <div className="mb-4">
+          <label>Mileage</label>
+          <input
+            type="number"
+            value={mileage}
+            onChange={(e) => setMileage(e.target.value)}
+            className="block w-full border rounded p-2"
+          />
+        </div>
+        <div className="mb-4">
+          <label>Owner ID</label>
+          <input
+            type="text"
+            value={ownerId}
+            onChange={(e) => setOwnerId(e.target.value)}
+            required
+            className="block w-full border rounded p-2"
+          />
+        </div>
+        <div className="mb-4">
           <label>Car Image</label>
           <input
             type="file"
@@ -102,7 +141,15 @@ export default function CarForm() {
           Submit
         </button>
       </form>
-      {message && <p className="mt-4">{message}</p>}
+      {message && (
+        <div
+          className={`mt-4 p-3 rounded-lg text-center text-white ${
+            message.type === "success" ? "bg-green-500" : "bg-red-500"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
     </div>
   );
 }
