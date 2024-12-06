@@ -9,13 +9,14 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 model Bid {
   id        Int      @id @default(autoincrement())
   amount    Float
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onUpdate: NoAction, onDelete: NoAction)
   userId    Int
   car       Car      @relation(fields: [carId], references: [id])
   carId     Int
@@ -44,9 +45,9 @@ model Transaction {
   amount    Float
   car       Car      @relation(fields: [carId], references: [id])
   carId     Int
-  buyer     User     @relation("Buyer", fields: [buyerId], references: [id])
+  buyer     User     @relation("Buyer", fields: [buyerId], references: [id], onUpdate: NoAction, onDelete: NoAction)
   buyerId   Int
-  seller    User     @relation("Seller", fields: [sellerId], references: [id])
+  seller    User     @relation("Seller", fields: [sellerId], references: [id], onUpdate: NoAction, onDelete: NoAction)
   sellerId  Int
   createdAt DateTime @default(now())
 }

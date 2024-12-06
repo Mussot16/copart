@@ -6,7 +6,7 @@ services:
       NODE_ENV: production
       HOSTNAME: "0.0.0.0"
       PORT: 3000
-      DATABASE_URL: mysql://root:tyronne2001!@db:3306/esquema # Use 'db' as the hostname because Docker resolves it to the MySQL container
+      DATABASE_URL: mysql://root:tyronne2001!@copart-db-1:3306/esquema # Use 'db' as the hostname because Docker resolves it to the MySQL container
     ports:
       - "3000:3000"
     depends_on:
