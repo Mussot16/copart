@@ -1,5 +1,5 @@
 import './globals.css';
-import NavbarClient from './components/NavBarClient'; // New client-side wrapper
+import NavbarClient from './components/NavbarClient'; // New client-side wrapper
 import Providers from './components/Providers';
 
 export const metadata = {

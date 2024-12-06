@@ -4,7 +4,16 @@ const prisma = new PrismaClient();
 
 export async function GET(req) {
   try {
-    const cars = await prisma.car.findMany();
+    // Fetch cars that are not sold
+    const cars = await prisma.car.findMany({
+      where: {
+        sold: false, // Only include cars that are not sold
+      },
+      include: {
+        owner: { select: { name: true } }, // Optional: Include owner information
+      },
+    });
+
     return new Response(JSON.stringify({ cars }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

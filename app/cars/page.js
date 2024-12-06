@@ -5,7 +5,11 @@ import Link from "next/link";
 const prisma = new PrismaClient();
 
 async function getCars() {
-  return await prisma.car.findMany();
+  return await prisma.car.findMany({
+    where: {
+      sold: false, // Only fetch cars that are not sold
+    },
+  });
 }
 
 export default async function CarsPage() {

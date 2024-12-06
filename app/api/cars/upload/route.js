@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import busboy from "busboy";
-import { Readable } from "stream"; // Import Node.js Readable
+import { Readable } from "stream";
 import cloudinary from "../../../../utils/cloudinary";
 import { NextResponse } from "next/server";
 
@@ -71,9 +71,9 @@ export async function POST(req) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    const { make, model, year, price, description, color, mileage, ownerId } = fields;
+    const { make, model, year, price, description, color, mileage, ownerId, buyNowPrice } = fields;
 
-    if (!make || !model || !year || !price || !ownerId) {
+    if (!make || !model || !year || !price || !ownerId || !buyNowPrice) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -101,6 +101,7 @@ export async function POST(req) {
         model,
         year: parseInt(year, 10),
         price: parseFloat(price),
+        buyNowPrice: parseFloat(buyNowPrice), // Added buyNowPrice
         description,
         color, // Optional field
         mileage: mileage ? parseInt(mileage, 10) : null, // Optional field

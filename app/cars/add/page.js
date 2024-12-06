@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 
 export default function CarForm() {
@@ -7,6 +8,7 @@ export default function CarForm() {
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
   const [price, setPrice] = useState("");
+  const [buyNowPrice, setBuyNowPrice] = useState(""); // Added buyNowPrice field
   const [description, setDescription] = useState("");
   const [color, setColor] = useState(""); // Optional color
   const [mileage, setMileage] = useState(""); // Optional mileage
@@ -22,6 +24,7 @@ export default function CarForm() {
     formData.append("model", model);
     formData.append("year", year);
     formData.append("price", price);
+    formData.append("buyNowPrice", buyNowPrice); // Include buyNowPrice
     formData.append("description", description);
     formData.append("color", color); // Optional
     formData.append("mileage", mileage); // Optional
@@ -36,6 +39,17 @@ export default function CarForm() {
       const data = await response.json();
       if (response.ok) {
         setMessage({ text: "Car added successfully!", type: "success" });
+        // Clear the form fields
+        setFile(null);
+        setMake("");
+        setModel("");
+        setYear("");
+        setPrice("");
+        setBuyNowPrice("");
+        setDescription("");
+        setColor("");
+        setMileage("");
+        setOwnerId("");
       } else {
         setMessage({ text: data.error || "Failed to add car.", type: "error" });
       }
@@ -85,6 +99,16 @@ export default function CarForm() {
             type="number"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
+            required
+            className="block w-full border rounded p-2"
+          />
+        </div>
+        <div className="mb-4">
+          <label>Buy Now Price</label>
+          <input
+            type="number"
+            value={buyNowPrice}
+            onChange={(e) => setBuyNowPrice(e.target.value)}
             required
             className="block w-full border rounded p-2"
           />

@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { broadcast } from "@/server"; // Import broadcast function
 
 const prisma = new PrismaClient();
 
@@ -13,6 +12,30 @@ export async function POST(req, { params }) {
   }
 
   try {
+    const car = await prisma.car.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!car) {
+      return NextResponse.json({ success: false, error: "Car not found" }, { status: 404 });
+    }
+
+    if (car.sold) {
+      return NextResponse.json({ success: false, error: "Car is already sold" }, { status: 400 });
+    }
+
+    if (parseFloat(amount) >= car.buyNowPrice) {
+      await prisma.car.update({
+        where: { id: parseInt(id) },
+        data: { sold: true, buyerId: parseInt(userId) },
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: "Car purchased via Buy Now price",
+      });
+    }
+
     const bid = await prisma.bid.create({
       data: {
         amount: parseFloat(amount),
@@ -23,9 +46,6 @@ export async function POST(req, { params }) {
         user: { select: { name: true } },
       },
     });
-
-    // Notify WebSocket server of the new bid
-    broadcast({ type: "new_bid", bid });
 
     return NextResponse.json({ success: true, bid }, { status: 201 });
   } catch (error) {
@@ -44,7 +64,9 @@ export async function GET(req, { params }) {
       include: { user: { select: { name: true } } },
     });
 
-    return NextResponse.json({ bids }, { status: 200 });
+    const highestBid = bids.length > 0 ? bids[0].amount : 0;
+
+    return NextResponse.json({ bids, highestBid }, { status: 200 });
   } catch (error) {
     console.error("Error fetching bids:", error);
     return NextResponse.json({ error: "Failed to fetch bids" }, { status: 500 });
