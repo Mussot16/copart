@@ -12,6 +12,7 @@ export default function CarDetail({ car, params }) {
   const [buyNowPrice, setBuyNowPrice] = useState(car.buyNowPrice || null);
   const [sold, setSold] = useState(car.sold);
 
+  // Fetch car details and bids periodically
   useEffect(() => {
     const fetchCarDetails = async () => {
       try {
@@ -21,6 +22,7 @@ export default function CarDetail({ car, params }) {
           setBids(data.car.bids);
           setHighestBid(data.car.highestBid);
           setSold(data.car.sold);
+          if (data.car.timeLeft) setTimeLeft(data.car.timeLeft); // Sync countdown
         } else {
           console.error("Failed to fetch car details");
         }
@@ -31,10 +33,30 @@ export default function CarDetail({ car, params }) {
 
     fetchCarDetails();
 
-    const intervalId = setInterval(fetchCarDetails, 5000);
+    const intervalId = setInterval(fetchCarDetails, 5000); // Update every 5 seconds
 
-    return () => clearInterval(intervalId);
+    return () => clearInterval(intervalId); // Cleanup on unmount
   }, [params.id]);
+
+  // WebSocket connection for real-time updates
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:3002");
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+
+      if (message.type === "countdown") {
+        setTimeLeft(message.remainingTime); // Update countdown in real-time
+      }
+
+      if (message.type === "new_bid") {
+        setBids((prevBids) => [message.bid, ...prevBids]);
+        setHighestBid(message.bid.amount); // Update highest bid
+      }
+    };
+
+    return () => socket.close(); // Close WebSocket on unmount
+  }, []);
 
   const placeBid = async () => {
     if (!session) {
